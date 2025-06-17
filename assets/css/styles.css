@@ -1,0 +1,9 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Style for disabled buttons to make them visually distinct and non-interactive */
+.disabled-button {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
