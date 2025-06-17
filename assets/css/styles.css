@@ -1,9 +1,49 @@
+
 body {
     font-family: 'Inter', sans-serif;
 }
 
-/* Style for disabled buttons to make them visually distinct and non-interactive */
 .disabled-button {
     cursor: not-allowed;
     opacity: 0.5;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f8fafc;
+}
+
+.quantity-btn {
+    background-color: transparent;
+    border: none;
+    color: #4f46e5;
+    font-size: 1.25rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.quantity-btn:hover {
+    background-color: #e0e7ff;
+}
+
+.quantity-btn:disabled {
+    color: #a5b4fc;
+    cursor: not-allowed;
+}
+
+.quantity-btn:disabled:hover {
+    background-color: transparent;
+}
+
+.quantity-display {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.9rem;
 }
