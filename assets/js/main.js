@@ -53,7 +53,7 @@ new Vue({
         fetchLessons() {
             // Fetches all lessons from the backend.
             this.loading = true;
-            fetch(`${API_URL}/courses`)
+            fetch(`${API_URL}/lessons`)
                 .then(response => {
                     if (!response.ok) { throw new Error('Network response was not ok'); }
                     return response.json();
@@ -64,6 +64,8 @@ new Vue({
                 })
                 .catch(error => {
                     console.error('Error fetching lessons:', error);
+                    // Provide feedback to the user in the UI
+                    this.lessons = [];
                     this.loading = false;
                 });
         },
@@ -76,7 +78,8 @@ new Vue({
 
             // Otherwise, fetch lessons matching the search query.
             this.loading = true;
-            fetch(`${API_URL}/courses/search?query=${this.searchTerm}`)
+            // Using the /search endpoint as specified
+            fetch(`${API_URL}/search?q=${this.searchTerm}`)
                 .then(response => {
                      if (!response.ok) { throw new Error('Network response was not ok'); }
                      return response.json();
@@ -94,11 +97,15 @@ new Vue({
         addToCart(lesson) {
             // Adds a lesson to the shopping cart.
             if (lesson.availableSpaces > 0) {
-                lesson.availableSpaces--; // Decrease available spaces on the main list
+                // The availableSpaces property on the lesson object itself is updated.
+                // This updated lesson object is then added to the cart.
+                lesson.availableSpaces--; 
                 const cartItem = this.cart.find(item => item._id === lesson._id);
                 if (cartItem) {
                     // If item is already in cart, just increase its quantity
                     cartItem.quantity++;
+                    // Also update the spaces count in the existing cart item
+                    cartItem.availableSpaces = lesson.availableSpaces;
                 } else {
                     // Otherwise, add the new lesson to the cart
                     this.cart.push({ ...lesson, quantity: 1 });
