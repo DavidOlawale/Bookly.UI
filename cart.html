@@ -34,7 +34,7 @@
                 <div v-else class="space-y-4">
                     <div v-for="(item, index) in cart" :key="item._id" class="bg-white p-4 rounded-xl shadow-md flex items-center justify-between">
                         <div class="flex items-center">
-                            <img :src="item.image" :alt="item.name" class="w-20 h-20 object-cover rounded-lg mr-4">
+                            <img :src="backendUrl + item.image" @error="imageLoadError" :alt="item.name" class="w-20 h-20 object-cover rounded-lg mr-4">
                             <div>
                                 <h3 class="font-bold text-lg">{{ item.name }}</h3>
                                 <p class="text-gray-600">${{ item.price }}</p>
@@ -55,7 +55,7 @@
                     <form @submit.prevent="submitOrder">
                         <div class="mb-4">
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input type="text" id="name" v-model.trim="order.name" class="w-full p-2 border rounded-lg" :class="{'border-red-500': !isNameValid && order.name}" placeholder="e.g., Jane Doe">
+                            <input type="text" id="name" v-model.trim="order.name" class="w-full p-2 border rounded-lg" :class="{'border-red-500': !isNameValid && order.name}" placeholder="e.g., David Ola">
                              <p v-if="!isNameValid && order.name" class="text-red-500 text-xs mt-1">Name must contain only letters.</p>
                         </div>
                         <div class="mb-6">
