@@ -1,7 +1,8 @@
 new Vue({
     el: '#cart-app',
     data: {
-        backendUrl: 'http://localhost:3000', 
+        //backendUrl: 'http://localhost:3000',
+        backendUrl: 'https://bookly-api-f8mw.onrender.com',
         cart: [],
         order: {
             name: '',
