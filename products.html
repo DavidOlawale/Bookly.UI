@@ -10,10 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
 
-    <div id="app">
-
+    <div id="app" class="flex-grow">
         <header class="bg-white shadow-md sticky top-0 z-50 mb-8 border-b border-gray-300">
             <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
                 <div class="flex items-center">
@@ -23,13 +22,12 @@
                 <div class="hidden md:flex space-x-8 items-center font-medium">
                     <a href="#" class="text-gray-600 hover:text-indigo-600 transition">Home</a>
                     <a href="products.html" class="text-gray-600 text-indigo-600 transition">Courses</a>
-                    <a href="cart.html" class="text-gray-600 hover:text-indigo-600 transition">Cart</a>
                     <a href="#testimonials" class="text-gray-600 hover:text-indigo-600 transition">Reviews</a>
                     <a href="#contact" class="text-gray-600 hover:text-indigo-600 transition">Contact</a>
                 </div>
                 <a href="cart.html"
-                    :class="['bg-indigo-600 text-white py-2 px-5 rounded-lg shadow-md hover:bg-indigo-700 transition-transform transform hover:scale-105 font-semibold', { 'disabled-button': cart.length === 0 }]"
-                    :disabled="cart.length === 0">
+                   :class="['bg-indigo-600 text-white py-2 px-5 rounded-lg shadow-md hover:bg-indigo-700 transition-transform transform hover:scale-105 font-semibold', { 'disabled-button': cart.length === 0 }]"
+                   :disabled="cart.length === 0">
                     <i class="fas fa-shopping-cart mr-2"></i>
                     Cart ({{ cartItemCount }})
                 </a>
@@ -37,7 +35,6 @@
         </header>
 
         <main class="container mx-auto p-4 sm:p-6 lg:p-8">
-            <!-- Search and Sort Controls -->
             <div class="bg-white p-6 rounded-xl shadow-md mb-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div>
@@ -64,7 +61,7 @@
                              <button @click="sort.order = 'asc'" :class="['w-full py-1 rounded-md text-sm', sort.order === 'asc' ? 'bg-indigo-600 text-white shadow' : 'bg-white text-gray-600 hover:bg-gray-200']">
                                 <i class="fas fa-arrow-up mr-1"></i> Ascending
                             </button>
-                            <button @click="sort.order = 'desc'" :class="['w-full py-1 rounded-md text-sm', sort.order === 'desc' ? 'bg-indigo-600 text-white shadow' : 'bg-white text-gray-600 hover:bg-gray-200']">
+                             <button @click="sort.order = 'desc'" :class="['w-full py-1 rounded-md text-sm', sort.order === 'desc' ? 'bg-indigo-600 text-white shadow' : 'bg-white text-gray-600 hover:bg-gray-200']">
                                 <i class="fas fa-arrow-down mr-1"></i> Descending
                             </button>
                         </div>
@@ -72,7 +69,6 @@
                 </div>
             </div>
 
-            <!-- Lessons Grid -->
             <div v-if="loading" class="text-center py-10">
                 <i class="fas fa-spinner fa-spin text-4xl text-indigo-600"></i>
                 <p class="mt-2 text-lg">Loading Classes...</p>
@@ -97,13 +93,11 @@
                         </div>
 
                         <div class="mt-auto">
-                            <!-- Show quantity controller if item is already in cart -->
                             <div v-if="getCartQuantity(lesson._id) > 0" class="quantity-control">
                                 <button @click="removeItem(lesson)" class="quantity-btn">-</button>
                                 <span class="quantity-display">{{ getCartQuantity(lesson._id) }} in cart</span>
                                 <button @click="addItem(lesson)" :disabled="lesson.availableSpaces <= 0" class="quantity-btn">+</button>
                             </div>
-                            <!-- Otherwise, show the default Add to Cart button -->
                             <button v-else @click="addItem(lesson)" :disabled="lesson.availableSpaces <= 0" :class="['w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition-all', { 'disabled-button': lesson.availableSpaces <= 0 }]">
                                 <i class="fas fa-cart-plus mr-2"></i> Add to Cart
                             </button>

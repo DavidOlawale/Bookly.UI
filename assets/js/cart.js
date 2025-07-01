@@ -9,7 +9,8 @@ new Vue({
             phone: ''
         },
         orderPlaced: false,
-        isSubmitting: false
+        isSubmitting: false,
+        lastOrder: null // Will hold the details of the last successful order
     },
     computed: {
         isNameValid() {
@@ -70,7 +71,8 @@ new Vue({
             .then(data => {
                 console.log('Order successful:', data);
                 const updatePromises = cartForUpdate.map(item => {
-                    const updatedSpaces = item.availableSpaces - item.quantity;
+                    // This logic assumes availableSpaces is present in the cart item
+                    const updatedSpaces = item.availableSpaces - item.quantity; 
                     return fetch(`${this.backendUrl}/api/lessons/${item._id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
@@ -84,12 +86,20 @@ new Vue({
                     if (!res.ok) throw new Error('Failed to update one or more lessons.');
                 });
                 console.log('All lessons updated successfully.');
+                
+                // Store order details for the invoice before clearing everything
+                this.lastOrder = {
+                    items: cartForUpdate,
+                    name: this.order.name,
+                    phone: this.order.phone,
+                    total: this.totalCost
+                };
+
                 this.orderPlaced = true;
                 this.cart = [];
                 this.saveCart();
                 this.order.name = '';
                 this.order.phone = '';
-                setTimeout(() => { this.orderPlaced = false; }, 5000);
             })
             .catch(error => {
                 console.error('An error occurred during checkout:', error);

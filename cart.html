@@ -9,80 +9,119 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
 
-    <div id="cart-app" class="container mx-auto p-4 sm:p-6 lg:p-8">
-        <header class="flex justify-between items-center mb-8 pb-4 border-b border-gray-300">
-             <div class="flex items-center">
-                <i class="fas fa-book-open text-3xl text-indigo-600 mr-3"></i>
-                <h1 class="text-3xl font-bold text-gray-800">Shopping Cart</h1>
-            </div>
-            <a href="index.html" class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg shadow-sm hover:bg-gray-300 transition">
-                <i class="fas fa-arrow-left mr-2"></i>
-                Back to Classes
-            </a>
+    <div id="cart-app" class="flex-grow">
+        <header class="bg-white shadow-md sticky top-0 z-50 mb-8 border-b border-gray-300">
+            <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-graduation-cap text-3xl text-indigo-600 mr-2"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">Bookly</h1>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center font-medium">
+                    <a href="index.html" class="text-gray-600 hover:text-indigo-600 transition">Home</a>
+                    <a href="products.html" class="text-gray-600 hover:text-indigo-600 transition">Courses</a>
+                    <a href="index.html#testimonials" class="text-gray-600 hover:text-indigo-600 transition">Reviews</a>
+                    <a href="index.html#contact" class="text-gray-600 hover:text-indigo-600 transition">Contact</a>
+                </div>
+                <a href="products.html" class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg shadow-sm hover:bg-gray-300 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Classes
+                </a>
+            </nav>
         </header>
 
-        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2">
-                <div v-if="cart.length === 0" class="text-center py-12 bg-white rounded-xl shadow-md">
-                    <i class="fas fa-shopping-cart text-5xl text-gray-300"></i>
-                    <h2 class="mt-4 text-2xl font-semibold text-gray-700">Your cart is empty</h2>
-                    <p class="text-gray-500 mt-2">Looks like you haven't added any classes yet!</p>
+        <main class="container mx-auto p-4">
+            <div v-if="orderPlaced && lastOrder" class="bg-white p-8 rounded-xl shadow-lg max-w-2xl mx-auto my-12">
+                <div class="text-center mb-8">
+                    <i class="fas fa-check-circle text-5xl text-green-500"></i>
+                    <h2 class="mt-4 text-3xl font-bold text-gray-800">Thank You for Your Order!</h2>
+                    <p class="text-gray-600">Your invoice has been generated below.</p>
                 </div>
-
-                <div v-else class="space-y-4">
-                    <div v-for="(item, index) in cart" :key="item._id" class="bg-white p-4 rounded-xl shadow-md flex items-center justify-between">
-                        <div class="flex items-center">
-                            <img :src="backendUrl + item.image" @error="imageLoadError" :alt="item.name" class="w-20 h-20 object-cover rounded-lg mr-4">
-                            <div>
-                                <h3 class="font-bold text-lg">{{ item.name }}</h3>
-                                <p class="text-gray-600">${{ item.price }}</p>
-                                <p class="text-gray-500 text-sm">Quantity: {{ item.quantity }}</p>
-                            </div>
-                        </div>
-                        <button @click="removeFromCart(index)" class="text-red-500 hover:text-red-700 font-semibold py-2 px-3 rounded-lg hover:bg-red-100 transition">
-                             <i class="fas fa-trash-alt mr-1"></i> Remove
-                        </button>
+                <div class="border-t border-b border-gray-200 py-6">
+                    <div class="flex justify-between text-sm text-gray-600 mb-4">
+                        <span><strong>Order For:</strong> {{ lastOrder.name }}</span>
+                        <span><strong>Phone:</strong> {{ lastOrder.phone }}</span>
                     </div>
+                    <ul>
+                        <li v-for="item in lastOrder.items" :key="item._id" class="flex justify-between items-center py-2 border-b last:border-0">
+                            <span>
+                                {{ item.name }} (x{{ item.quantity }})
+                            </span>
+                            <span class="font-medium">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="flex justify-end text-xl font-bold text-gray-800 mt-6">
+                    <span>Total:</span>
+                    <span class="ml-4 text-indigo-600">${{ lastOrder.total.toFixed(2) }}</span>
                 </div>
             </div>
 
-            <!-- Checkout Form -->
-            <div class="lg:col-span-1">
-                <div v-if="cart.length > 0" class="bg-white p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold mb-6 border-b pb-4">Checkout</h2>
-                    <form @submit.prevent="submitOrder">
-                        <div class="mb-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input type="text" id="name" v-model.trim="order.name" class="w-full p-2 border rounded-lg" :class="{'border-red-500': !isNameValid && order.name}" placeholder="e.g., David Ola">
-                             <p v-if="!isNameValid && order.name" class="text-red-500 text-xs mt-1">Name must contain only letters.</p>
+            <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <div v-if="cart.length === 0" class="text-center py-16 bg-white rounded-xl shadow-md">
+                        <i class="fas fa-shopping-cart text-5xl text-gray-300"></i>
+                        <h2 class="mt-4 text-2xl font-semibold text-gray-700">Your cart is empty</h2>
+                        <p class="text-gray-500 mt-2">Looks like you haven't added any classes yet!</p>
+                    </div>
+
+                    <div v-else class="space-y-4">
+                        <div v-for="(item, index) in cart" :key="item._id" class="bg-white p-4 rounded-xl shadow-md flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img :src="backendUrl + item.image" @error="imageLoadError" :alt="item.name" class="w-20 h-20 object-cover rounded-lg mr-4">
+                                <div>
+                                    <h3 class="font-bold text-lg">{{ item.name }}</h3>
+                                    <p class="text-gray-600">${{ item.price }}</p>
+                                    <p class="text-gray-500 text-sm">Quantity: {{ item.quantity }}</p>
+                                </div>
+                            </div>
+                            <button @click="removeFromCart(index)" class="text-red-500 hover:text-red-700 font-semibold py-2 px-3 rounded-lg hover:bg-red-100 transition">
+                                 <i class="fas fa-trash-alt mr-1"></i> Remove
+                            </button>
                         </div>
-                        <div class="mb-6">
-                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                            <input type="text" id="phone" v-model.trim="order.phone" class="w-full p-2 border rounded-lg" :class="{'border-red-500': !isPhoneValid && order.phone}" placeholder="e.g., 1234567890">
-                            <p v-if="!isPhoneValid && order.phone" class="text-red-500 text-xs mt-1">Phone must contain only numbers.</p>
-                        </div>
-                         <div class="text-right mb-6 text-2xl font-bold">
-                            Total: <span class="text-indigo-600">${{ totalCost }}</span>
-                        </div>
-                        <button type="submit" :disabled="!isCheckoutValid" :class="['w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-green-600 transition', { 'disabled-button': !isCheckoutValid }]">
-                            <i class="fas fa-check-circle mr-2"></i> Place Order
-                        </button>
-                    </form>
+                    </div>
                 </div>
-                 <!-- Order Confirmation Message -->
-                <div v-if="orderPlaced" class="mt-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-md" role="alert">
-                    <p class="font-bold">Order Submitted!</p>
-                    <p>Thank you for your purchase. Your confirmation has been received.</p>
+
+                <div class="lg:col-span-1">
+                    <div v-if="cart.length > 0" class="bg-white p-6 rounded-xl shadow-md">
+                        <h2 class="text-2xl font-bold mb-6 border-b pb-4">Checkout</h2>
+                        <form @submit.prevent="submitOrder">
+                            <div class="mb-4">
+                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                <input type="text" id="name" v-model.trim="order.name" class="w-full p-2 border rounded-lg" :class="{'border-red-500': !isNameValid && order.name}" placeholder="e.g., David Ola">
+                                 <p v-if="!isNameValid && order.name" class="text-red-500 text-xs mt-1">Name must contain only letters.</p>
+                            </div>
+                            <div class="mb-6">
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                <input type="text" id="phone" v-model.trim="order.phone" class="w-full p-2 border rounded-lg" :class="{'border-red-500': !isPhoneValid && order.phone}" placeholder="e.g., 1234567890">
+                                <p v-if="!isPhoneValid && order.phone" class="text-red-500 text-xs mt-1">Phone must contain only numbers.</p>
+                            </div>
+                             <div class="text-right mb-6 text-2xl font-bold">
+                                Total: <span class="text-indigo-600">${{ totalCost.toFixed(2) }}</span>
+                            </div>
+                            <button type="submit" :disabled="!isCheckoutValid" :class="['w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:bg-green-600 transition', { 'disabled-button': !isCheckoutValid }]">
+                                <i class="fas fa-check-circle mr-2"></i> Place Order
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Vue.js -->
+    <footer id="contact" class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">&copy; 2025 Bookly. All Rights Reserved.</p>
+            <div class="mt-4 flex justify-center space-x-6">
+                <a href="#" class="hover:text-indigo-400"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-indigo-400"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-indigo-400"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-    <!-- Custom Vue App Logic -->
     <script src="assets/js/cart.js"></script>
 </body>
 </html>
